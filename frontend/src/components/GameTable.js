@@ -1,14 +1,15 @@
-
 import React, { useState, useEffect } from 'react';
-import { Table, Input, Button, Space, Checkbox } from 'antd';
-import { SearchOutlined, FilterFilled } from '@ant-design/icons';
+import { Table, Input, Button, Space, Checkbox, Card } from 'antd';
+import { SearchOutlined, FilterFilled, CloseOutlined } from '@ant-design/icons';
 import axios from 'axios';
+import './css/GameTable.css';
 
 const GameTable = () => {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filteredInfo, setFilteredInfo] = useState({});
+  const [selectedGame, setSelectedGame] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -31,6 +32,20 @@ const GameTable = () => {
 
   const handleChange = (pagination, filters, sorter) => {
     setFilteredInfo(filters);
+  };
+
+  const handleRowClick = (record) => {
+    setSelectedGame(record);
+  };
+
+  const handleEditGame = () => {
+  };
+
+  const handleDeleteGame = () => {
+  };
+
+  const closeCard = () => {
+    setSelectedGame(null);
   };
 
   const getColumnSearchProps = (dataIndex) => ({
@@ -117,9 +132,6 @@ const GameTable = () => {
     },
   });
 
-  
-  
-  
   const columns = [
     { 
       title: 'Rank', 
@@ -193,14 +205,57 @@ const GameTable = () => {
   ];
 
   return (
-    <Table
-      dataSource={games}
-      columns={columns}
-      loading={loading}
-      pagination={{ pageSize: 10 }}
-      onChange={handleChange}
-    />
+    <>
+      <Table
+        dataSource={games}
+        columns={columns}
+        loading={loading}
+        pagination={{ pageSize: 10 }}
+        onChange={handleChange}
+        onRow={(record) => ({
+          onClick: () => handleRowClick(record)
+        })}
+      />
+      {selectedGame && (
+        <div className="modal">
+          <GameCard
+            game={selectedGame}
+            onEdit={handleEditGame}
+            onClose={closeCard}
+          />
+        </div>
+      )}
+    </>
   );
 };
+
+const GameCard = ({ game, onEdit, onClose }) => {
+    return (
+      <div className="custom-card">
+        <div className="card-header">
+          <h2>{game.name}</h2>
+          <button className="close-button" onClick={onClose}><CloseOutlined/></button>
+        </div>
+        <div className="card-flex">
+          <div className="card-body">
+            <p>Rank: {game.rank}</p>
+            <p>Platform: {game.platform}</p>
+            <p>Year: {game.year}</p>
+            <p>Genre: {game.genre}</p>
+            <p>Publisher: {game.publisher}</p>
+            <p>NA Sales: {game.na_sales}</p>
+            <p>EU Sales: {game.eu_sales}</p>
+            <p>JP Sales: {game.jp_sales}</p>
+            <p>Other Sales: {game.other_sales}</p>
+            <p>Global Sales: {game.global_sales}</p>
+            <button className="edit-button" onClick={onEdit}>Edit</button>
+          </div>
+          <div className="card-footer">
+            <p>Reviews</p>
+          </div>
+        </div>
+      </div>
+    );
+  };  
 
 export default GameTable;
