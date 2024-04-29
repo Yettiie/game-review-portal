@@ -13,7 +13,7 @@ const db = require('./db.js');
 
 app.get('/api/data', async (req, res) => {
   try {
-    const data = await db.any('SELECT * FROM vgsales LIMIT 10');
+    const data = await db.any('SELECT * FROM vgsales LIMIT 1000');
 
     if (Array.isArray(data)) {
       res.json(data);
