@@ -1,13 +1,11 @@
 const pgp = require('pg-promise')();
 
-const connection = {
-  host: 'localhost',
+const db = pgp({
+  host: 'postgres',
   port: 5432,
-  database: 'game_review_portal',
-  user: 'your_username',
-  password: 'your_password'
-};
-
-const db = pgp(connection);
+  database: 'game-review-portal',
+  user: 'postgres',
+  password: 'password'
+});
 
 module.exports = db;

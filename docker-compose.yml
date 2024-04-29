@@ -1,6 +1,15 @@
-version: '4.29.0'
+version: '3.8'
 
 services:
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+    volumes:
+      - ./backend:/app
+
   postgres:
     image: postgres
     ports:
@@ -9,3 +18,9 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_DB: game-review-portal
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+volumes:
+  backend:
+  pg_data:
