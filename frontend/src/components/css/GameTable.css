@@ -117,4 +117,7 @@
   }
   
 
-  
+  .review-content{
+    height: 200px;
+    overflow: auto;
+  }
