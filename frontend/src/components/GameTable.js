@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Input, Button, Space } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
+import { Table, Input, Button, Space, Checkbox } from 'antd';
+import { SearchOutlined, FilterFilled } from '@ant-design/icons';
 import axios from 'axios';
 import './css/GameTable.css';
 import GameCard from './GameCard';
@@ -80,6 +80,58 @@ const GameTable = () => {
     onFilter: (value, record) => record[dataIndex].toString().toLowerCase().includes(value.toLowerCase())
   });
 
+  const getColumnFilterProps = (dataIndex) => ({
+    filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
+      <div style={{ padding: 8 }}>
+        <Input
+          id={`${dataIndex}-search`}
+          placeholder={`Search ${dataIndex}`}
+          value={selectedKeys[0]}
+          onChange={(e) => setSelectedKeys(e.target.value ? [e.target.value] : [])}
+          onPressEnter={() => confirm()}
+          style={{ width: 188, marginBottom: 8, display: 'block' }}
+        />
+        <div style={{ height: 300, overflow: 'auto' }}>
+            {games.map(record => record[dataIndex]).filter((value, index, self) => self.indexOf(value) === index).map(value => (
+            <div key={value} style={{ marginBottom: 8 }}>
+                <Checkbox
+                checked={selectedKeys.includes(value)}
+                onChange={e => {
+                    const nextSelectedKeys = selectedKeys.includes(value)
+                    ? selectedKeys.filter(key => key !== value)
+                    : [...selectedKeys, value];
+                    setSelectedKeys(nextSelectedKeys);
+                }}
+                >
+                {value}
+                </Checkbox>
+            </div>
+            ))}
+        </div>
+        <Button
+          type="primary"
+          onClick={() => confirm()}
+          size="small"
+          style={{ width: '100%', marginTop: 8 }}
+        >
+          OK
+        </Button>
+        <Button onClick={() => clearFilters()} size="small" style={{ width: '100%', marginTop: 8 }}>
+          Reset
+        </Button>
+      </div>
+    ),
+    filterIcon: (filtered) => <FilterFilled style={{ color: filtered ? '#1890ff' : undefined }} />,
+    onFilterDropdownOpenChange: (open) => {
+      if (open) {
+        const searchInput = document.getElementById(`${dataIndex}-search`);
+        if (searchInput) {
+          setTimeout(() => searchInput.select(), 100);
+        }
+      }
+    },
+  });
+
   const columns = [
     { 
       title: 'Rank', 
@@ -98,6 +150,7 @@ const GameTable = () => {
       dataIndex: 'platform', 
       sorter: (a, b) => a.platform.localeCompare(b.platform), 
       ...getColumnSearchProps('platform'),
+      ...getColumnFilterProps('platform')
     },
     { 
       title: 'Year', 
@@ -110,12 +163,14 @@ const GameTable = () => {
       dataIndex: 'genre', 
       sorter: (a, b) => a.genre.localeCompare(b.genre), 
       ...getColumnSearchProps('genre'),
+      ...getColumnFilterProps('genre')
     },
     { 
       title: 'Publisher', 
       dataIndex: 'publisher', 
       sorter: (a, b) => a.publisher.localeCompare(b.publisher), 
       ...getColumnSearchProps('publisher'),
+      ...getColumnFilterProps('publisher')
     },
     { 
       title: 'NA Sales', 

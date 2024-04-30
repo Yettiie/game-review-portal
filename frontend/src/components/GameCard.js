@@ -24,10 +24,10 @@ const GameCard = ({ game, onEdit, onClose }) => {
   const handleAddReview = async () => {
     try {
       await axios.post('http://localhost:5000/api/reviews', {
-        app_id: game.app_id,
         appName: game.name,
         review: newReview
       });
+      console.log(game.app_id);
       fetchReviews();
       setNewReview('');
     } catch (error) {
@@ -71,6 +71,7 @@ const GameCard = ({ game, onEdit, onClose }) => {
               <div key={review.app_id}>
                 <p>{review.review_text}</p>
                 <Button onClick={() => handleDeleteReview(review.app_id)}>Delete</Button>
+                <Button>Edit</Button>
               </div>
             ))}
           </div>

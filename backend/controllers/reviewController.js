@@ -13,8 +13,33 @@ const reviewController = {
   },
 
   addReview: async (req, res) => {
-    const { app_id, appName, review } = req.body;
+    const {appName, review} = req.body;
+
+    const existingGame = await db.oneOrNone('SELECT * FROM dataset WHERE app_name = $1 LIMIT 1', [appName]);
+
+    let app_id;
+    if (existingGame) {
+      app_id = existingGame.app_id;
+    }
+
+    // We don't have else{} branch because in interface you can get to reviews by clicking on existing game 
+
+    // else{
+    //   const highestAppIdQuery = 'SELECT * FROM dataset ORDER BY app_id DESC LIMIT 1';
+    //   const highestAppIdRecord = await db.oneOrNone(highestAppIdQuery);
+
+    //   if (highestAppIdRecord) {
+    //     app_id = highestAppIdRecord.app_id + 1;
+    //   } else {
+    //     app_id = 1;
+    //   }
+    // }
+
+    
+
+
     try {
+
       await db.none('INSERT INTO dataset (app_id, app_name, review_text, review_score, review_votes) VALUES ($1, $2, $3, $4, $5)', [app_id, appName, review, 1, 1]);
       res.status(201).json({ message: 'Review added successfully' });
     } catch (error) {
