@@ -179,13 +179,16 @@ const GameCard = ({ game, onEdit, onClose }) => {
       title: 'Review Score',
       dataIndex: 'review_score',
       key: 'review_score',
+      sorter: (a, b) => a.review_score - b.review_score,
       ...getColumnSearchProps('review_score'),
-      ...getColumnFilterProps('review_score')
+      ...getColumnFilterProps('review_score'),
     },
     {
       title: 'Review Votes',
       dataIndex: 'review_votes',
-      key: 'review_votes'
+      key: 'review_votes',
+      sorter: (a, b) => a.review_notes - b.review_votes,
+      ...getColumnSearchProps('review_votes'),
     },
     {
       title: 'Actions',
