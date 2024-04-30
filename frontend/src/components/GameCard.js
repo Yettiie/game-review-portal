@@ -230,7 +230,7 @@ const GameCard = ({ game, onEdit, onClose }) => {
           <Button icon={<EditOutlined />} onClick={() => handleEditReview(record)}>Edit</Button>
           <Popconfirm
             title="Are you sure to delete this review?"
-            onConfirm={() => handleDeleteReview(record.app_id)}
+            onConfirm={() => handleDeleteReview(record.id)}
             okText="Yes"
             cancelText="No"
           >
