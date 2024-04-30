@@ -29,7 +29,9 @@ const reviewController = {
     }
 
     
-
+    if (!review.trim()) {
+      return res.status(400).json({ error: 'Review text cannot be empty' });
+    }
 
     try {
 
