@@ -20,27 +20,20 @@ const reviewController = {
     let app_id;
     if (existingGame) {
       app_id = existingGame.app_id;
+    } 
+    else{
+      const highestAppIdQuery = 'SELECT * FROM dataset where app_id is not null ORDER BY app_id DESC LIMIT 1';
+      const highestAppIdRecord = await db.oneOrNone(highestAppIdQuery);
+
+      app_id = highestAppIdRecord.app_id+1;
     }
-
-    // We don't have else{} branch because in interface you can get to reviews by clicking on existing game 
-
-    // else{
-    //   const highestAppIdQuery = 'SELECT * FROM dataset ORDER BY app_id DESC LIMIT 1';
-    //   const highestAppIdRecord = await db.oneOrNone(highestAppIdQuery);
-
-    //   if (highestAppIdRecord) {
-    //     app_id = highestAppIdRecord.app_id + 1;
-    //   } else {
-    //     app_id = 1;
-    //   }
-    // }
 
     
 
 
     try {
 
-      await db.none('INSERT INTO dataset (app_id, app_name, review_text, review_score, review_votes) VALUES ($1, $2, $3, $4, $5)', [app_id, appName, review, 1, 1]);
+      await db.none('INSERT INTO dataset (app_id, app_name, review_text, review_score, review_votes) VALUES ($1, $2, $3, $4, $5)', [app_id, appName, review, 1, 0]);
       res.status(201).json({ message: 'Review added successfully' });
     } catch (error) {
       console.error('Error adding review:', error);
