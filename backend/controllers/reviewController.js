@@ -58,7 +58,7 @@ const reviewController = {
     const { id } = req.params;
     const { review_text, review_score } = req.body;
     
-    // review text cannot be empty
+    // Review text cannot be empty
     if (!review_text.trim()) {
       return res.status(400).json({ error: 'Review text cannot be empty' });
     }

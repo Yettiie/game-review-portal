@@ -8,6 +8,7 @@ import GameTable from './components/GameTable';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
+    <h1>Game Review Portal</h1>
     <GameTable />
   </React.StrictMode>
 );

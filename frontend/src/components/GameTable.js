@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Input, Button, Space, Checkbox } from 'antd';
-import { SearchOutlined, FilterFilled } from '@ant-design/icons';
+import { Table, Input, Button, Space, Checkbox, Modal, message } from 'antd';
+import { SearchOutlined, FilterFilled, PlusOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import './css/GameTable.css';
 import GameCard from './GameCard';
@@ -11,6 +11,19 @@ const GameTable = () => {
   const [error, setError] = useState(null);
   const [filteredInfo, setFilteredInfo] = useState({});
   const [selectedGame, setSelectedGame] = useState(null);
+  const [addGameModalVisible, setAddGameModalVisible] = useState(false);
+  const [newGameData, setNewGameData] = useState({
+    name: '',
+    platform: '',
+    year: '',
+    genre: '',
+    publisher: '',
+    na_sales: '',
+    eu_sales: '',
+    jp_sales: '',
+    other_sales: '',
+    global_sales: ''
+  });
 
   useEffect(() => {
     fetchData();
@@ -48,6 +61,41 @@ const GameTable = () => {
   const closeCard = () => {
     setSelectedGame(null);
   };
+
+  const handleInput = (e, fieldName) => {
+    setNewGameData({ ...newGameData, [fieldName]: e.target.value });
+  };
+
+  const handleAddGame = () => {
+    setAddGameModalVisible(true);
+  };
+
+  const handleAddNewGame = async () => {
+    if (
+      !newGameData.name ||
+      !newGameData.platform ||
+      !newGameData.year ||
+      !newGameData.genre ||
+      !newGameData.publisher ||
+      !newGameData.na_sales ||
+      !newGameData.eu_sales ||
+      !newGameData.jp_sales ||
+      !newGameData.other_sales ||
+      !newGameData.global_sales 
+    ) {
+      message.error('All fields are required.');
+      return;
+    }
+
+    try {
+      await axios.post('http://localhost:5000/api/api/data', newGameData);
+      fetchData();
+      setAddGameModalVisible(false);
+    } catch (error) {
+      console.error('Error adding new game:', error);
+    }
+  };
+
 
   const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
@@ -206,6 +254,7 @@ const GameTable = () => {
 
   return (
     <>
+      <Button style={{marginBottom: 10}}onClick={handleAddGame} type="primary" icon={<PlusOutlined />}>Add New Game</Button>
       <Table
         dataSource={games}
         columns={columns}
@@ -216,11 +265,35 @@ const GameTable = () => {
           onClick: () => handleRowClick(record)
         })}
       />
+      <Modal
+        title="Add New Game"
+        visible={addGameModalVisible}
+        onCancel={() => setAddGameModalVisible(false)}
+        footer={[
+          <Button key="cancel" onClick={() => setAddGameModalVisible(false)}>
+            Cancel
+          </Button>,
+          <Button key="add" type="primary" onClick={handleAddNewGame}>
+            Add Game
+          </Button>,
+        ]}
+      >
+        <Input placeholder="Name" value={newGameData.name} onChange={(e) => handleInput(e, 'name')} />
+        <Input placeholder="Platform" value={newGameData.platform} onChange={(e) => handleInput(e, 'platform')} />
+        <Input placeholder="Year" value={newGameData.year} onChange={(e) => handleInput(e, 'year')} />
+        <Input placeholder="Genre" value={newGameData.genre} onChange={(e) => handleInput(e, 'genre')} />
+        <Input placeholder="Publisher" value={newGameData.publisher} onChange={(e) => handleInput(e, 'publisher')} />
+        <Input placeholder="NA Sales" value={newGameData.na_sales} onChange={(e) => handleInput(e, 'na_sales')} />
+        <Input placeholder="EU Sales" value={newGameData.eu_sales} onChange={(e) => handleInput(e, 'eu_sales')} />
+        <Input placeholder="JP Sales" value={newGameData.jp_sales} onChange={(e) => handleInput(e, 'jp_sales')} />
+        <Input placeholder="Other Sales" value={newGameData.other_sales} onChange={(e) => handleInput(e, 'other_sales')} />
+        <Input placeholder="Global Sales" value={newGameData.global_sales} onChange={(e) => handleInput(e, 'global_sales')} />
+      </Modal>
       {selectedGame && (
         <div className="modal">
           <GameCard
             game={selectedGame}
-            onEdit={handleEditGame}
+            onEdit={fetchData}
             onClose={closeCard}
           />
         </div>

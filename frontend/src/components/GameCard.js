@@ -13,6 +13,19 @@ const GameCard = ({ game, onEdit, onClose }) => {
   const [editingReview, setEditingReview] = useState(null);
   const [editedReviewText, setEditedReviewText] = useState('');
   const [editedReviewLiked, setEditedReviewLiked] = useState(false);
+  const [editedGameDetails, setEditedGameDetails] = useState({
+    name: game.name,
+    platform: game.platform,
+    year: game.year,
+    genre: game.genre,
+    publisher: game.publisher,
+    na_sales: game.na_sales,
+    eu_sales: game.eu_sales,
+    jp_sales: game.jp_sales,
+    other_sales: game.other_sales,
+    global_sales: game.global_sales
+  });
+  const [editGameModalVisible, setEditGameModalVisible] = useState(false);
 
   useEffect(() => {
     fetchReviews();
@@ -91,6 +104,51 @@ const GameCard = ({ game, onEdit, onClose }) => {
       setLoading(false);
     }
   };
+
+  const handleEditGame = async () => {
+    // Validate input fields
+    if (
+      !editedGameDetails.name ||
+      !editedGameDetails.platform ||
+      !editedGameDetails.year ||
+      !editedGameDetails.genre ||
+      !editedGameDetails.publisher ||
+      !editedGameDetails.na_sales ||
+      !editedGameDetails.eu_sales ||
+      !editedGameDetails.jp_sales ||
+      !editedGameDetails.other_sales ||
+      !editedGameDetails.global_sales
+    ) {
+      message.error('All fields are required.');
+      return;
+    }
+
+
+    try {
+      setLoading(true);
+      await axios.put(`http://localhost:5000/api/api/data/${game.rank}`, {
+        name: editedGameDetails.name,
+        platform: editedGameDetails.platform,
+        year: editedGameDetails.year,
+        genre: editedGameDetails.genre,
+        publisher: editedGameDetails.publisher,
+        na_sales: editedGameDetails.na_sales,
+        eu_sales: editedGameDetails.eu_sales,
+        jp_sales: editedGameDetails.jp_sales,
+        other_sales: editedGameDetails.other_sales,
+        global_sales: editedGameDetails.global_sales,
+      });
+      message.success('Game details updated successfully.');
+      onClose(); // Close the game card
+      onEdit(); // Fetch game table again
+    } catch (error) {
+      console.error('Error updating game:', error);
+      message.error('Failed to update game details. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
 
   const getColumnSearchProps = (dataIndex) => ({
@@ -259,7 +317,65 @@ const GameCard = ({ game, onEdit, onClose }) => {
           <p>JP Sales: {game.jp_sales}</p>
           <p>Other Sales: {game.other_sales}</p>
           <p>Global Sales: {game.global_sales}</p>
-          <Button className="edit-button" onClick={onEdit}>Edit</Button>
+          <Button className="edit-button" onClick={() => setEditGameModalVisible(true)}>Edit</Button>
+          <Modal
+            title="Edit Game Details"
+            visible={editGameModalVisible}
+            onOk={handleEditGame}
+            onCancel={() => setEditGameModalVisible(false)}
+            confirmLoading={loading}
+          >
+            <Input
+              value={editedGameDetails.name}
+              onChange={(e) => setEditedGameDetails({ ...editedGameDetails, name: e.target.value })}
+              placeholder="Game Name"
+            />
+            <Input
+              value={editedGameDetails.platform}
+              onChange={(e) => setEditedGameDetails({ ...editedGameDetails, platform: e.target.value })}
+              placeholder="Platform"
+            />
+            <Input
+              value={editedGameDetails.year}
+              onChange={(e) => setEditedGameDetails({ ...editedGameDetails, year: e.target.value })}
+              placeholder="Year"
+            />
+            <Input
+              value={editedGameDetails.genre}
+              onChange={(e) => setEditedGameDetails({ ...editedGameDetails, genre: e.target.value })}
+              placeholder="Genre"
+            />
+            <Input
+              value={editedGameDetails.publisher}
+              onChange={(e) => setEditedGameDetails({ ...editedGameDetails, publisher: e.target.value })}
+              placeholder="Publisher"
+            />
+            <Input
+              value={editedGameDetails.na_sales}
+              onChange={(e) => setEditedGameDetails({ ...editedGameDetails, na_sales: e.target.value })}
+              placeholder="NA Sales"
+            />
+            <Input
+              value={editedGameDetails.eu_sales}
+              onChange={(e) => setEditedGameDetails({ ...editedGameDetails, eu_sales: e.target.value })}
+              placeholder="EU Sales"
+            />
+            <Input
+              value={editedGameDetails.jp_sales}
+              onChange={(e) => setEditedGameDetails({ ...editedGameDetails, jp_sales: e.target.value })}
+              placeholder="JP Sales"
+            />
+            <Input
+              value={editedGameDetails.other_sales}
+              onChange={(e) => setEditedGameDetails({ ...editedGameDetails, other_sales: e.target.value })}
+              placeholder="Other Sales"
+            />
+            <Input
+              value={editedGameDetails.global_sales}
+              onChange={(e) => setEditedGameDetails({ ...editedGameDetails, global_sales: e.target.value })}
+              placeholder="Global Sales"
+            />
+          </Modal>
         </div>
         <div className="card-footer">
           <h3>Reviews:</h3>
