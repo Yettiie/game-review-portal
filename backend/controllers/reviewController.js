@@ -13,7 +13,7 @@ const reviewController = {
   },
 
   addReview: async (req, res) => {
-    const {appName, review} = req.body;
+    const {appName, review, review_score} = req.body;
 
     const existingGame = await db.oneOrNone('SELECT * FROM dataset WHERE app_name = $1 LIMIT 1', [appName]);
 
@@ -33,7 +33,7 @@ const reviewController = {
 
     try {
 
-      await db.none('INSERT INTO dataset (app_id, app_name, review_text, review_score, review_votes) VALUES ($1, $2, $3, $4, $5)', [app_id, appName, review, 1, 0]);
+      await db.none('INSERT INTO dataset (app_id, app_name, review_text, review_score, review_votes) VALUES ($1, $2, $3, $4, $5)', [app_id, appName, review, review_score, 0]);
       res.status(201).json({ message: 'Review added successfully' });
     } catch (error) {
       console.error('Error adding review:', error);

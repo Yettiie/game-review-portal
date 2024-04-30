@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Input, Button, Table, Popconfirm, message, Checkbox, Space } from 'antd';
-import { CloseOutlined, EditOutlined, DeleteOutlined, FilterFilled, SearchOutlined, } from '@ant-design/icons';
+import { CloseOutlined, EditOutlined, DeleteOutlined, FilterFilled, SearchOutlined, LikeOutlined, LikeFilled } from '@ant-design/icons';
 import axios from 'axios';
 import './css/GameTable.css';
 
@@ -8,6 +8,7 @@ const GameCard = ({ game, onEdit, onClose }) => {
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState('');
   const [loading, setLoading] = useState(false);
+  const [liked, setLiked] = useState(false);
 
   useEffect(() => {
     fetchReviews();
@@ -31,11 +32,15 @@ const GameCard = ({ game, onEdit, onClose }) => {
       setLoading(true);
       await axios.post('http://localhost:5000/api/reviews', {
         appName: game.name,
-        review: newReview
+        review: newReview,
+        review_score: liked ? 1 : -1
       });
       fetchReviews();
       setNewReview('');
       message.success('Review added successfully.');
+      if(liked){
+        setLiked(!liked);
+      }
     } catch (error) {
       console.error('Error adding review:', error);
       message.error('Failed to add review. Please try again.');
@@ -59,8 +64,8 @@ const GameCard = ({ game, onEdit, onClose }) => {
   };
 
   const handleEditReview = async (review) => {
-
-  }
+    // Handle edit review functionality here
+  };
 
   const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
@@ -151,6 +156,7 @@ const GameCard = ({ game, onEdit, onClose }) => {
     },
   });
 
+
   const columns = [
     {
       title: 'ID',
@@ -208,7 +214,6 @@ const GameCard = ({ game, onEdit, onClose }) => {
       )
     }
   ];
-  
 
   return (
     <div className="custom-card">
@@ -248,6 +253,13 @@ const GameCard = ({ game, onEdit, onClose }) => {
             placeholder="Add a review"
           />
           <Button onClick={handleAddReview} loading={loading}>Add Review</Button>
+          <Button
+            icon={liked ? <LikeFilled /> : <LikeOutlined />}
+            onClick={() => setLiked(!liked)}
+            style={{ marginLeft: '8px' }}
+          >
+            {liked ? 'Liked!' : 'Like'}
+          </Button>
         </div>
       </div>
     </div>
