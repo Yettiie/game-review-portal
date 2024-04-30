@@ -50,6 +50,24 @@ const reviewController = {
       console.error('Error deleting review:', error);
       res.status(500).json({ error: 'Internal server error' });
     }
+  },
+
+  updateReview: async (req, res) => {
+    const { id } = req.params;
+    const { review_text, review_score } = req.body;
+    
+    // review text cannot be empty
+    if (!review_text.trim()) {
+      return res.status(400).json({ error: 'Review text cannot be empty' });
+    }
+  
+    try {
+      await db.none('UPDATE dataset SET review_text = $1, review_score = $2 WHERE id = $3', [review_text, review_score, id]);
+      res.json({ message: 'Review updated successfully' });
+    } catch (error) {
+      console.error('Error updating review:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
   }
 };
 

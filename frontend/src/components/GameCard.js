@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Input, Button, Table, Popconfirm, message, Checkbox, Space } from 'antd';
+import { Input, Button, Table, Popconfirm, message, Checkbox, Space, Modal } from 'antd';
 import { CloseOutlined, EditOutlined, DeleteOutlined, FilterFilled, SearchOutlined, LikeOutlined, LikeFilled } from '@ant-design/icons';
 import axios from 'axios';
 import './css/GameTable.css';
@@ -9,6 +9,10 @@ const GameCard = ({ game, onEdit, onClose }) => {
   const [newReview, setNewReview] = useState('');
   const [loading, setLoading] = useState(false);
   const [liked, setLiked] = useState(false);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [editingReview, setEditingReview] = useState(null);
+  const [editedReviewText, setEditedReviewText] = useState('');
+  const [editedReviewLiked, setEditedReviewLiked] = useState(false);
 
   useEffect(() => {
     fetchReviews();
@@ -63,9 +67,31 @@ const GameCard = ({ game, onEdit, onClose }) => {
     }
   };
 
-  const handleEditReview = async (review) => {
-    // Handle edit review functionality here
+  const handleEditReview = (review) => {
+    setEditingReview(review);
+    setEditedReviewText(review.review_text);
+    setEditedReviewLiked(review.review_score === 1);
+    setEditModalVisible(true);
   };
+
+  const saveEditedReview = async () => {
+    try {
+      setLoading(true);
+      await axios.put(`http://localhost:5000/api/reviews/${editingReview.id}`, {
+        review_text: editedReviewText,
+        review_score: editedReviewLiked ? 1 : -1
+      });
+      fetchReviews();
+      setEditModalVisible(false);
+      message.success('Review updated successfully.');
+    } catch (error) {
+      console.error('Error updating review:', error);
+      message.error('Failed to update review. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const getColumnSearchProps = (dataIndex) => ({
     filterDropdown: ({ setSelectedKeys, selectedKeys, confirm, clearFilters }) => (
@@ -261,6 +287,26 @@ const GameCard = ({ game, onEdit, onClose }) => {
             {liked ? 'Liked!' : 'Like'}
           </Button>
         </div>
+      <Modal
+        title="Edit Review"
+        visible={editModalVisible}
+        onOk={saveEditedReview}
+        onCancel={() => setEditModalVisible(false)}
+        confirmLoading={loading}
+      >
+        <Input.TextArea
+          value={editedReviewText}
+          onChange={e => setEditedReviewText(e.target.value)}
+          placeholder="Edit review text"
+        />
+        <Button
+          icon={editedReviewLiked ? <LikeFilled /> : <LikeOutlined />}
+          onClick={() => setEditedReviewLiked(!editedReviewLiked)}
+          style={{ marginTop: '8px' }}
+        >
+          {editedReviewLiked ? 'Liked!' : 'Like'}
+        </Button>
+      </Modal>
       </div>
     </div>
   );
